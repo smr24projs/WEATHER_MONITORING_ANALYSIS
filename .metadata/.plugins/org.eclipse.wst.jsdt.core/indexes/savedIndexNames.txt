@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+D:\sem6\WeatherMonitoring_BigData-master\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+2665049814.index
+362266501.index
+339585008.index
+1989665509.index
+811749619.index
+4136000979.index

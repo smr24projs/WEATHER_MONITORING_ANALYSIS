@@ -1,0 +1,58 @@
+package com.example.weather.ui;
+
+import com.example.weather.database.DatabaseManager;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class WeatherChartUI extends Application {
+
+	public static void display() {
+	    Platform.runLater(() -> {
+	        try {
+	            new WeatherChartUI().start(new Stage()); // Create a new Stage instead of launching the application
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    });
+	}
+
+
+    @Override
+    public void start(Stage stage) {
+        stage.setTitle("Weather Trends");
+
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Timestamp");
+
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Temperature (°C)");
+
+        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Temperature Trends");
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Temperature Over Time");
+
+        try (ResultSet rs = DatabaseManager.fetchWeatherHistory()) {
+            while (rs != null && rs.next()) {
+                series.getData().add(new XYChart.Data<>(rs.getString("timestamp"), rs.getDouble("temperature")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        lineChart.getData().add(series);
+        Scene scene = new Scene(lineChart, 800, 600);
+        stage.setScene(scene);
+        stage.show();
+    }
+}

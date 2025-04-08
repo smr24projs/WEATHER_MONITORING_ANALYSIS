@@ -1,0 +1,1494 @@
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.scene.Scene;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        VBox root = new VBox();
+////        root.getChildren().add(new Label("🌤 Welcome to the Weather Monitoring System!"));
+////
+////        Scene scene = new Scene(root, 400, 300);
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.setScene(scene);
+////        primaryStage.show();
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.LineChart;
+////import javafx.scene.chart.NumberAxis;
+////import javafx.scene.chart.XYChart;
+////import javafx.scene.control.Button;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////
+////import java.io.BufferedReader;
+////import java.io.InputStreamReader;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import java.util.Timer;
+////import java.util.TimerTask;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label weatherLabel;
+////    private XYChart.Series<Number, Number> temperatureSeries;
+////    private int timeCounter = 0;  // X-axis time counter
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        VBox root = new VBox();
+////
+////        // Weather Label
+////        weatherLabel = new Label("🌤 Weather data will appear here...");
+////
+////        // Refresh Button
+////        Button refreshButton = new Button("Refresh Weather");
+////        refreshButton.setOnAction(e -> fetchWeatherData());
+////
+////        // Temperature Chart
+////        NumberAxis xAxis = new NumberAxis();
+////        NumberAxis yAxis = new NumberAxis();
+////        xAxis.setLabel("Time (seconds)");
+////        yAxis.setLabel("Temperature (°C)");
+////
+////        LineChart<Number, Number> temperatureChart = new LineChart<>(xAxis, yAxis);
+////        temperatureChart.setTitle("Temperature Trend");
+////
+////        temperatureSeries = new XYChart.Series<>();
+////        temperatureSeries.setName("Temperature");
+////        temperatureChart.getData().add(temperatureSeries);
+////
+////        root.getChildren().addAll(weatherLabel, refreshButton, temperatureChart);
+////
+////        Scene scene = new Scene(root, 600, 400);
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.setScene(scene);
+////        primaryStage.show();
+////
+////        // Start fetching weather data automatically every 5 seconds
+////        startRealTimeUpdates();
+////    }
+////
+////    private void fetchWeatherData() {
+////        new Thread(() -> {
+////            try {
+////                String apiUrl = "http://localhost:8080/weather";  // Change this to your actual API endpoint
+////                URL url = new URL(apiUrl);
+////                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+////                conn.setRequestMethod("GET");
+////
+////                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////                StringBuilder response = new StringBuilder();
+////                String line;
+////
+////                while ((line = reader.readLine()) != null) {
+////                    response.append(line);
+////                }
+////                reader.close();
+////
+////                // Parse JSON response
+////                JSONObject json = new JSONObject(response.toString());
+////                String temperature = json.getString("temperature");
+////                String humidity = json.getString("humidity");
+////                double tempValue = Double.parseDouble(temperature);
+////
+////                // Update UI
+////                Platform.runLater(() -> {
+////                    weatherLabel.setText("🌡 Temperature: " + temperature + "°C\n💧 Humidity: " + humidity + "%");
+////                    updateChart(tempValue);
+////                });
+////
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////                Platform.runLater(() -> weatherLabel.setText("⚠ Error fetching weather data!"));
+////            }
+////        }).start();
+////    }
+////
+////    private void updateChart(double temperature) {
+////        if (temperatureSeries.getData().size() > 20) {
+////            temperatureSeries.getData().remove(0); // Keep only the last 20 data points
+////        }
+////        temperatureSeries.getData().add(new XYChart.Data<>(timeCounter++, temperature));
+////    }
+////
+////    private void startRealTimeUpdates() {
+////        Timer timer = new Timer();
+////        timer.scheduleAtFixedRate(new TimerTask() {
+////            @Override
+////            public void run() {
+////                fetchWeatherData();
+////            }
+////        }, 0, 5000);  // Fetch data every 5 seconds
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+//
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.scene.Scene;
+////import javafx.scene.control.Label;
+////import javafx.scene.control.Button;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////import java.io.BufferedReader;
+////import java.io.InputStreamReader;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import org.json.JSONObject;
+////import java.io.BufferedReader;
+////import java.io.InputStreamReader;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import javafx.geometry.Pos;
+////
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private static final String API_KEY = "6e1a202fdcb54fcb42c67944d7fa6671"; // Replace with your API key
+////    private static final String CITY = "Pune"; // Change to your preferred city
+////    private static final String API_URL = "https://api.openweathermap.org/data/2.5/weather?q=" + CITY + "&appid=" + API_KEY + "&units=metric";
+////
+////    private Label weatherLabel;
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        weatherLabel = new Label("Fetching weather data...");
+////        Button refreshButton = new Button("Refresh Weather");
+////        refreshButton.setOnAction(e -> fetchWeatherData());
+////
+////        VBox root = new VBox(10, weatherLabel, refreshButton);
+////        root.setAlignment(Pos.CENTER);
+////        Scene scene = new Scene(root, 400, 300);
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.setScene(scene);
+////        primaryStage.show();
+////
+////        fetchWeatherData(); // Fetch on startup
+////    }
+////
+////    private void fetchWeatherData() {
+////        new Thread(() -> {
+////            try {
+////                URL url = new URL(API_URL);
+////                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+////                conn.setRequestMethod("GET");
+////
+////                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////                StringBuilder response = new StringBuilder();
+////                String line;
+////                while ((line = reader.readLine()) != null) {
+////                    response.append(line);
+////                }
+////                reader.close();
+////
+////                JSONObject json = new JSONObject(response.toString());
+////                String weatherDescription = json.getJSONArray("weather").getJSONObject(0).getString("description");
+////                double temperature = json.getJSONObject("main").getDouble("temp");
+////
+////                Platform.runLater(() -> weatherLabel.setText("🌤 " + CITY + ": " + temperature + "°C, " + weatherDescription));
+////
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////                Platform.runLater(() -> weatherLabel.setText("⚠️ Error fetching weather data!"));
+////            }
+////        }).start();
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+////
+//
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.LineChart;
+////import javafx.scene.chart.NumberAxis;
+////import javafx.scene.chart.XYChart;
+////import javafx.scene.control.Button;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////
+////import java.io.BufferedReader;
+////import java.io.InputStreamReader;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import java.util.concurrent.atomic.AtomicInteger;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label tempLabel = new Label("Temperature: Loading...");
+////    private Label humidityLabel = new Label("Humidity: Loading...");
+////    private Label windSpeedLabel = new Label("Wind Speed: Loading...");
+////    private XYChart.Series<Number, Number> tempSeries = new XYChart.Series<>();
+////    private AtomicInteger timeStep = new AtomicInteger(0);
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        VBox root = new VBox(10);
+////
+////        // Weather Data Labels
+////        root.getChildren().addAll(tempLabel, humidityLabel, windSpeedLabel);
+////
+////        // Fetch Data Button
+////        Button fetchWeatherButton = new Button("Fetch Weather Data");
+////        fetchWeatherButton.setOnAction(e -> fetchWeatherData());
+////        root.getChildren().add(fetchWeatherButton);
+////
+////        // Line Chart for Temperature Trends
+////        NumberAxis xAxis = new NumberAxis();
+////        NumberAxis yAxis = new NumberAxis();
+////        xAxis.setLabel("Time");
+////        yAxis.setLabel("Temperature (°C)");
+////        LineChart<Number, Number> tempChart = new LineChart<>(xAxis, yAxis);
+////        tempSeries.setName("Temperature Trend");
+////        tempChart.getData().add(tempSeries);
+////        root.getChildren().add(tempChart);
+////
+////        // Set Scene
+////        Scene scene = new Scene(root, 500, 400);
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.setScene(scene);
+////        primaryStage.show();
+////    }
+////
+////    private void fetchWeatherData() {
+////        new Thread(() -> {
+////            try {
+////                // Replace with your OpenWeatherMap API key
+////                String apiKey = "6e1a202fdcb54fcb42c67944d7fa6671";
+////                String city = "Pune"; // Change to your preferred location
+////                String urlString = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+////
+////                URL url = new URL(urlString);
+////                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+////                conn.setRequestMethod("GET");
+////
+////                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////                StringBuilder response = new StringBuilder();
+////                String line;
+////                while ((line = reader.readLine()) != null) {
+////                    response.append(line);
+////                }
+////                reader.close();
+////
+////                // Parse JSON Response
+////                JSONObject jsonResponse = new JSONObject(response.toString());
+////                double temperature = jsonResponse.getJSONObject("main").getDouble("temp");
+////                int humidity = jsonResponse.getJSONObject("main").getInt("humidity");
+////                double windSpeed = jsonResponse.getJSONObject("wind").getDouble("speed");
+////
+////                // Update UI on JavaFX Thread
+////                Platform.runLater(() -> {
+////                    tempLabel.setText("Temperature: " + temperature + "°C");
+////                    humidityLabel.setText("Humidity: " + humidity + "%");
+////                    windSpeedLabel.setText("Wind Speed: " + windSpeed + " m/s");
+////
+////                    // Add Data to Chart
+////                    tempSeries.getData().add(new XYChart.Data<>(timeStep.incrementAndGet(), temperature));
+////                });
+////
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////                Platform.runLater(() -> tempLabel.setText("Error fetching data!"));
+////            }
+////        }).start();
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.BarChart;
+////import javafx.scene.chart.CategoryAxis;
+////import javafx.scene.chart.NumberAxis;
+////import javafx.scene.chart.XYChart;
+////import javafx.scene.control.Button;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////
+////import java.io.BufferedReader;
+////import java.io.InputStreamReader;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import java.util.Timer;
+////import java.util.TimerTask;
+////
+////public class WeatherMonitoringUI extends Application {
+////    private static final String API_KEY = "6e1a202fdcb54fcb42c67944d7fa6671";
+////    private static final String CITY = "Pune";
+////    private static final String URL_TEMPLATE = "https://api.openweathermap.org/data/2.5/weather?q=" + CITY + "&appid=" + API_KEY + "&units=metric";
+////
+////    private Label temperatureLabel;
+////    private Label humidityLabel;
+////    private Label pressureLabel;
+////    private Label cloudCoverLabel;
+////    private BarChart<String, Number> weatherChart;
+////    private XYChart.Series<String, Number> series;
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        temperatureLabel = new Label("Temperature: Loading...");
+////        humidityLabel = new Label("Humidity: Loading...");
+////        pressureLabel = new Label("Pressure: Loading...");
+////        cloudCoverLabel = new Label("Cloud Cover: Loading...");
+////        
+////        Button refreshButton = new Button("Refresh Weather Data");
+////        refreshButton.setOnAction(event -> fetchWeatherData());
+////
+////        CategoryAxis xAxis = new CategoryAxis();
+////        xAxis.setLabel("Time");
+////        NumberAxis yAxis = new NumberAxis();
+////        yAxis.setLabel("Temperature (°C)");
+////
+////        weatherChart = new BarChart<>(xAxis, yAxis);
+////        weatherChart.setTitle("Temperature Trends");
+////        series = new XYChart.Series<>();
+////        series.setName("Temperature");
+////        weatherChart.getData().add(series);
+////
+////        VBox root = new VBox(10, temperatureLabel, humidityLabel, pressureLabel, cloudCoverLabel, refreshButton, weatherChart);
+////        Scene scene = new Scene(root, 600, 400);
+////
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.setScene(scene);
+////        primaryStage.show();
+////
+////        startAutoUpdate();
+////        fetchWeatherData();
+////    }
+////
+////    private void fetchWeatherData() {
+////        new Thread(() -> {
+////            try {
+////                URL url = new URL(URL_TEMPLATE);
+////                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+////                conn.setRequestMethod("GET");
+////                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////                StringBuilder response = new StringBuilder();
+////                String line;
+////                while ((line = reader.readLine()) != null) {
+////                    response.append(line);
+////                }
+////                reader.close();
+////                parseWeatherData(response.toString());
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////            }
+////        }).start();
+////    }
+////
+////    private void parseWeatherData(String jsonData) {
+////        JSONObject json = new JSONObject(jsonData);
+////        double temperature = json.getJSONObject("main").getDouble("temp");
+////        int humidity = json.getJSONObject("main").getInt("humidity");
+////        int pressure = json.getJSONObject("main").getInt("pressure");
+////        int cloudCover = json.getJSONObject("clouds").getInt("all");
+////
+////        Platform.runLater(() -> {
+////            temperatureLabel.setText("Temperature: " + temperature + " °C");
+////            humidityLabel.setText("Humidity: " + humidity + "%");
+////            pressureLabel.setText("Pressure: " + pressure + " hPa");
+////            cloudCoverLabel.setText("Cloud Cover: " + cloudCover + "%");
+////            updateChart(temperature);
+////        });
+////    }
+////
+////    private void updateChart(double temperature) {
+////        series.getData().add(new XYChart.Data<>(String.valueOf(System.currentTimeMillis()), temperature));
+////        if (series.getData().size() > 10) {
+////            series.getData().remove(0);
+////        }
+////    }
+////
+////    private void startAutoUpdate() {
+////        Timer timer = new Timer(true);
+////        timer.scheduleAtFixedRate(new TimerTask() {
+////            @Override
+////            public void run() {
+////                fetchWeatherData();
+////            }
+////        }, 0, 30000); // Update every 30 seconds
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.geometry.Insets;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.*;
+////import javafx.scene.control.*;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////import java.io.IOException;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import java.util.Scanner;
+////
+////public class WeatherMonitoringUI extends Application {
+////    private ComboBox<String> citySelector;
+////    private Label temperatureLabel;
+////    private Label humidityLabel;
+////    private BarChart<String, Number> barChart;
+////    private LineChart<Number, Number> lineChart;
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        // City selection dropdown
+////        citySelector = new ComboBox<>();
+////        citySelector.getItems().addAll("New York", "London", "Tokyo", "Mumbai", "Sydney");
+////        citySelector.setValue("New York");
+////
+////        // Button to fetch weather data
+////        Button fetchButton = new Button("Fetch Weather");
+////        fetchButton.setOnAction(e -> fetchWeatherData(citySelector.getValue()));
+////
+////        // Labels for displaying temperature and humidity
+////        temperatureLabel = new Label("Temperature: --");
+////        humidityLabel = new Label("Humidity: --");
+////
+////        // Bar Chart for displaying weather data
+////        CategoryAxis xAxis = new CategoryAxis();
+////        NumberAxis yAxis = new NumberAxis();
+////        barChart = new BarChart<>(xAxis, yAxis);
+////        barChart.setTitle("Weather Data");
+////
+////        // Line Chart for displaying temperature trends
+////        NumberAxis lineXAxis = new NumberAxis();
+////        NumberAxis lineYAxis = new NumberAxis();
+////        lineChart = new LineChart<>(lineXAxis, lineYAxis);
+////        lineChart.setTitle("Temperature Trends");
+////
+////        // Layout for the UI components
+////        VBox layout = new VBox(10, citySelector, fetchButton, temperatureLabel, humidityLabel, barChart, lineChart);
+////        layout.setPadding(new Insets(10));
+////
+////        // Set the scene and show the primary stage
+////        primaryStage.setScene(new Scene(layout, 600, 500));
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.show();
+////
+////        // Initial fetch for New York data
+////        fetchWeatherData(citySelector.getValue());
+////    }
+////
+////    private void fetchWeatherData(String city) {
+////        try {
+////            String apiKey = "6e1a202fdcb54fcb42c67944d7fa6671"; // Your API key here
+////            String urlString = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+////            HttpURLConnection conn = (HttpURLConnection) new URL(urlString).openConnection();
+////            conn.setRequestMethod("GET");
+////
+////            // Read the response
+////            Scanner scanner = new Scanner(conn.getInputStream());
+////            StringBuilder response = new StringBuilder();
+////            while (scanner.hasNext()) {
+////                response.append(scanner.nextLine());
+////            }
+////            scanner.close();
+////
+////            // Parse the JSON response
+////            JSONObject json = new JSONObject(response.toString());
+////            double temperature = json.getJSONObject("main").getDouble("temp");
+////            int humidity = json.getJSONObject("main").getInt("humidity");
+////
+////            // Update UI with fetched data
+////            temperatureLabel.setText("Temperature: " + temperature + "°C");
+////            humidityLabel.setText("Humidity: " + humidity + "%");
+////
+////            // Update charts with the new data
+////            updateCharts(city, temperature, humidity);
+////        } catch (IOException e) {
+////            temperatureLabel.setText("Error fetching data");
+////            e.printStackTrace();
+////        }
+////    }
+////
+////    private void updateCharts(String city, double temperature, int humidity) {
+////        // Update the bar chart with the current temperature and humidity
+////        XYChart.Series<String, Number> series = new XYChart.Series<>();
+////        series.setName(city);
+////        series.getData().add(new XYChart.Data<>("Temperature", temperature));
+////        series.getData().add(new XYChart.Data<>("Humidity", humidity));
+////        barChart.getData().clear();
+////        barChart.getData().add(series);
+////
+////        // Update the line chart with the temperature trend
+////        XYChart.Series<Number, Number> lineSeries = new XYChart.Series<>();
+////        lineSeries.setName(city);
+////        lineSeries.getData().add(new XYChart.Data<>(System.currentTimeMillis(), temperature));
+////        lineChart.getData().clear();
+////        lineChart.getData().add(lineSeries);
+////    }
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.geometry.Insets;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.*;
+////import javafx.scene.control.*;
+////import javafx.scene.layout.VBox;
+////import javafx.stage.Stage;
+////import org.json.JSONObject;
+////import java.io.IOException;
+////import java.net.HttpURLConnection;
+////import java.net.URL;
+////import java.util.Scanner;
+////
+////public class WeatherMonitoringUI extends Application {
+////    private ComboBox<String> citySelector;
+////    private Label temperatureLabel;
+////    private Label humidityLabel;
+////    private BarChart<String, Number> barChart;
+////    private LineChart<Number, Number> lineChart;
+////    
+////    @Override
+////    public void start(Stage primaryStage) {
+////        citySelector = new ComboBox<>();
+////        citySelector.getItems().addAll("New York", "London", "Tokyo", "Mumbai", "Sydney");
+////        citySelector.setValue("New York");
+////        Button fetchButton = new Button("Fetch Weather");
+////        fetchButton.setOnAction(e -> fetchWeatherData(citySelector.getValue()));
+////        
+////        temperatureLabel = new Label("Temperature: --");
+////        humidityLabel = new Label("Humidity: --");
+////        
+////        CategoryAxis xAxis = new CategoryAxis();
+////        NumberAxis yAxis = new NumberAxis();
+////        barChart = new BarChart<>(xAxis, yAxis);
+////        barChart.setTitle("Weather Data");
+////        
+////        NumberAxis lineXAxis = new NumberAxis();
+////        NumberAxis lineYAxis = new NumberAxis();
+////        lineChart = new LineChart<>(lineXAxis, lineYAxis);
+////        lineChart.setTitle("Temperature Trends");
+////        
+////        VBox layout = new VBox(10, citySelector, fetchButton, temperatureLabel, humidityLabel, barChart, lineChart);
+////        layout.setPadding(new Insets(10));
+////        primaryStage.setScene(new Scene(layout, 600, 500));
+////        primaryStage.setTitle("Weather Monitoring System");
+////        primaryStage.show();
+////        
+////        fetchWeatherData(citySelector.getValue());
+////    }
+////    
+////    private void fetchWeatherData(String city) {
+////        try {
+////            String apiKey = "6e1a202fdcb54fcb42c67944d7fa6671";
+////            String urlString = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+////            HttpURLConnection conn = (HttpURLConnection) new URL(urlString).openConnection();
+////            conn.setRequestMethod("GET");
+////            
+////            Scanner scanner = new Scanner(conn.getInputStream());
+////            StringBuilder response = new StringBuilder();
+////            while (scanner.hasNext()) {
+////                response.append(scanner.nextLine());
+////            }
+////            scanner.close();
+////            
+////            JSONObject json = new JSONObject(response.toString());
+////            double temperature = json.getJSONObject("main").getDouble("temp");
+////            int humidity = json.getJSONObject("main").getInt("humidity");
+////            
+////            temperatureLabel.setText("Temperature: " + temperature + "°C");
+////            humidityLabel.setText("Humidity: " + humidity + "%");
+////            
+////            updateCharts(city, temperature, humidity);
+////        } catch (IOException e) {
+////            temperatureLabel.setText("Error fetching data");
+////            humidityLabel.setText("");
+////        }
+////    }
+////    
+////    private void updateCharts(String city, double temperature, int humidity) {
+////        barChart.getData().clear();
+////        XYChart.Series<String, Number> series = new XYChart.Series<>();
+////        series.setName(city);
+////        series.getData().add(new XYChart.Data<>("Temperature", temperature));
+////        series.getData().add(new XYChart.Data<>("Humidity", humidity));
+////        barChart.getData().add(series);
+////        
+////        lineChart.getData().clear();
+////        XYChart.Series<Number, Number> tempSeries = new XYChart.Series<>();
+////        tempSeries.setName("Temperature Trend");
+////        for (int i = 1; i <= 5; i++) {
+////            tempSeries.getData().add(new XYChart.Data<>(i, temperature + Math.random() * 2 - 1));
+////        }
+////        lineChart.getData().add(tempSeries);
+////    }
+////    
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////}
+//
+//
+////package com.example.weather.ui;
+////import javafx.application.Application;
+////import javafx.collections.FXCollections;
+////import javafx.collections.ObservableList;
+////import javafx.scene.Scene;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.StackPane;
+////import javafx.stage.Stage;
+////import org.apache.kafka.clients.consumer.ConsumerConfig;
+////import org.apache.kafka.clients.consumer.ConsumerRecord;
+////import org.apache.kafka.clients.consumer.KafkaConsumer;
+////import org.json.JSONObject;
+////
+////import java.time.Duration;
+////import java.util.Collections;
+////import java.util.Properties;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label temperatureLabel = new Label();
+////    private Label humidityLabel = new Label();
+////    private static final String KAFKA_TOPIC = "weather-data";  // Kafka topic containing weather data
+////    private static final String KAFKA_SERVER = "localhost:9092";  // Kafka server URL
+////    private static final String KAFKA_GROUP_ID = "weather-consumer-group";  // Kafka consumer group
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        // UI Setup
+////        StackPane root = new StackPane();
+////        root.getChildren().addAll(temperatureLabel, humidityLabel);
+////        temperatureLabel.setLayoutX(50);
+////        temperatureLabel.setLayoutY(100);
+////        humidityLabel.setLayoutX(50);
+////        humidityLabel.setLayoutY(150);
+////
+////        // Set up the stage
+////        primaryStage.setTitle("Weather Monitoring");
+////        primaryStage.setScene(new Scene(root, 600, 400));
+////        primaryStage.show();
+////
+////        // Fetch data from Kafka (in a new thread)
+////        new Thread(this::consumeWeatherData).start();
+////    }
+////
+////    private void consumeWeatherData() {
+////        // Kafka Consumer Configuration
+////        Properties props = new Properties();
+////        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+////        props.put(ConsumerConfig.GROUP_ID_CONFIG, KAFKA_GROUP_ID);
+////        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////
+////        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+////        consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
+////
+////        while (true) {
+////            // Poll Kafka for new messages
+////            var records = consumer.poll(Duration.ofSeconds(5));
+////
+////            for (ConsumerRecord<String, String> record : records) {
+////                // Process each record from Kafka
+////                String value = record.value();
+////                JSONObject json = new JSONObject(value);
+////
+////                // Extract weather data from JSON
+////                if (json.has("main")) {
+////                    JSONObject main = json.getJSONObject("main");
+////                    double temperature = main.getDouble("temp");
+////                    int humidity = main.getInt("humidity");
+////
+////                    // Update the UI with the fetched data
+////                    javafx.application.Platform.runLater(() -> {
+////                        temperatureLabel.setText("Temperature: " + temperature + "°C");
+////                        humidityLabel.setText("Humidity: " + humidity + "%");
+////                    });
+////                } else {
+////                    // Handle missing data case
+////                    javafx.application.Platform.runLater(() -> {
+////                        temperatureLabel.setText("Error: Data not available.");
+////                        humidityLabel.setText("Please check the source.");
+////                    });
+////                }
+////            }
+////        }
+////    }
+////}
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.geometry.Insets;
+////import javafx.geometry.Pos;
+////import javafx.scene.Scene;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.scene.text.Font;
+////import javafx.stage.Stage;
+////import org.apache.kafka.clients.consumer.ConsumerConfig;
+////import org.apache.kafka.clients.consumer.ConsumerRecord;
+////import org.apache.kafka.clients.consumer.KafkaConsumer;
+////import org.json.JSONException;
+////import org.json.JSONObject;
+////
+////import java.time.Duration;
+////import java.util.Collections;
+////import java.util.Properties;
+////import java.util.concurrent.atomic.AtomicBoolean;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label statusLabel = new Label("Connecting to weather data source...");
+////    private Label temperatureLabel = new Label("Temperature: --°C");
+////    private Label humidityLabel = new Label("Humidity: --%");
+////    private static final String KAFKA_TOPIC = "weather-data";
+////    private static final String KAFKA_SERVER = "localhost:9092";
+////    private static final String KAFKA_GROUP_ID = "weather-consumer-group";
+////    private final AtomicBoolean running = new AtomicBoolean(true);
+////    
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        // UI Setup with proper layout
+////        VBox root = new VBox(20);
+////        root.setAlignment(Pos.CENTER);
+////        root.setPadding(new Insets(20));
+////        
+////        // Style the labels
+////        statusLabel.setFont(new Font(14));
+////        temperatureLabel.setFont(new Font(18));
+////        humidityLabel.setFont(new Font(18));
+////        
+////        root.getChildren().addAll(statusLabel, temperatureLabel, humidityLabel);
+////
+////        // Set up the stage
+////        primaryStage.setTitle("Weather Monitoring");
+////        primaryStage.setScene(new Scene(root, 600, 400));
+////        primaryStage.show();
+////
+////        // Fetch data from Kafka (in a new thread)
+////        Thread kafkaThread = new Thread(this::consumeWeatherData);
+////        kafkaThread.setDaemon(true); // Allow app to exit when closed
+////        kafkaThread.start();
+////        
+////        // Make sure to clean up when the application closes
+////        primaryStage.setOnCloseRequest(e -> running.set(false));
+////    }
+////
+////    private void consumeWeatherData() {
+////        // Kafka Consumer Configuration
+////        Properties props = new Properties();
+////        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+////        props.put(ConsumerConfig.GROUP_ID_CONFIG, KAFKA_GROUP_ID);
+////        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // Start with latest messages
+////
+////        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+////            consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
+////            
+////            // Update UI to show we're connected
+////            Platform.runLater(() -> statusLabel.setText("Connected. Waiting for weather data..."));
+////
+////            // Poll loop
+////            while (running.get()) {
+////                try {
+////                    // Poll Kafka for new messages
+////                    var records = consumer.poll(Duration.ofSeconds(3));
+////                    
+////                    if (records.isEmpty()) {
+////                        // No records received yet
+////                        continue;
+////                    }
+////
+////                    for (ConsumerRecord<String, String> record : records) {
+////                        // Process each record from Kafka
+////                        String value = record.value();
+////                        try {
+////                            JSONObject json = new JSONObject(value);
+////
+////                            // Extract weather data from JSON
+////                            if (json.has("main")) {
+////                                JSONObject main = json.getJSONObject("main");
+////                                double temperature = main.getDouble("temp");
+////                                int humidity = main.getInt("humidity");
+////
+////                                // Update the UI with the fetched data
+////                                Platform.runLater(() -> {
+////                                    statusLabel.setText("Last update: " + java.time.LocalTime.now().toString());
+////                                    temperatureLabel.setText("Temperature: " + temperature + "°C");
+////                                    humidityLabel.setText("Humidity: " + humidity + "%");
+////                                });
+////                            } else {
+////                                // Handle missing data case
+////                                Platform.runLater(() -> 
+////                                    statusLabel.setText("Received data but missing 'main' object. Check data format.")
+////                                );
+////                            }
+////                        } catch (JSONException e) {
+////                            // Handle JSON parsing errors
+////                            Platform.runLater(() -> 
+////                                statusLabel.setText("Error parsing data: " + e.getMessage())
+////                            );
+////                        }
+////                    }
+////                } catch (Exception e) {
+////                    // Handle general errors during polling
+////                    Platform.runLater(() -> 
+////                        statusLabel.setText("Error connecting to Kafka: " + e.getMessage())
+////                    );
+////                    
+////                    // Wait before retrying to avoid spinning
+////                    try {
+////                        Thread.sleep(5000);
+////                    } catch (InterruptedException ie) {
+////                        Thread.currentThread().interrupt();
+////                        break;
+////                    }
+////                }
+////            }
+////        } catch (Exception e) {
+////            // Handle consumer creation errors
+////            Platform.runLater(() -> 
+////                statusLabel.setText("Failed to initialize Kafka consumer: " + e.getMessage())
+////            );
+////        }
+////    }
+////}
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.geometry.Insets;
+////import javafx.geometry.Pos;
+////import javafx.scene.Scene;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.scene.text.Font;
+////import javafx.stage.Stage;
+////import org.apache.kafka.clients.consumer.ConsumerConfig;
+////import org.apache.kafka.clients.consumer.ConsumerRecord;
+////import org.apache.kafka.clients.consumer.KafkaConsumer;
+////import org.json.JSONException;
+////import org.json.JSONObject;
+////
+////import java.time.Duration;
+////import java.time.LocalDateTime;
+////import java.time.format.DateTimeFormatter;
+////import java.util.Collections;
+////import java.util.Properties;
+////import java.util.concurrent.atomic.AtomicBoolean;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label statusLabel = new Label("Connecting to weather data source...");
+////    private Label cityLabel = new Label("Location: --");
+////    private Label temperatureLabel = new Label("Temperature: --°C");
+////    private Label conditionLabel = new Label("Condition: --");
+////    private Label humidityLabel = new Label("Humidity: --%");
+////    private Label windLabel = new Label("Wind: -- m/s");
+////    
+////    private static final String KAFKA_TOPIC = "weather-data";
+////    private static final String KAFKA_SERVER = "localhost:9092";
+////    private static final String KAFKA_GROUP_ID = "weather-consumer-group";
+////    private final AtomicBoolean running = new AtomicBoolean(true);
+////    
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        // UI Setup with proper layout
+////        VBox root = new VBox(15);
+////        root.setAlignment(Pos.CENTER);
+////        root.setPadding(new Insets(20));
+////        
+////        // Style the labels
+////        statusLabel.setFont(new Font(14));
+////        cityLabel.setFont(new Font(20));
+////        temperatureLabel.setFont(new Font(18));
+////        conditionLabel.setFont(new Font(16));
+////        humidityLabel.setFont(new Font(16));
+////        windLabel.setFont(new Font(16));
+////        
+////        root.getChildren().addAll(
+////            statusLabel, 
+////            cityLabel,
+////            temperatureLabel, 
+////            conditionLabel,
+////            humidityLabel,
+////            windLabel
+////        );
+////
+////        // Set up the stage
+////        primaryStage.setTitle("Weather Monitoring");
+////        primaryStage.setScene(new Scene(root, 600, 400));
+////        primaryStage.show();
+////
+////        // Fetch data from Kafka (in a new thread)
+////        Thread kafkaThread = new Thread(this::consumeWeatherData);
+////        kafkaThread.setDaemon(true); // Allow app to exit when closed
+////        kafkaThread.start();
+////        
+////        // Make sure to clean up when the application closes
+////        primaryStage.setOnCloseRequest(e -> running.set(false));
+////    }
+////
+////    private void consumeWeatherData() {
+////        // Kafka Consumer Configuration
+////        Properties props = new Properties();
+////        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+////        props.put(ConsumerConfig.GROUP_ID_CONFIG, KAFKA_GROUP_ID);
+////        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // Start with latest messages
+////
+////        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+////            consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
+////            
+////            // Update UI to show we're connected
+////            Platform.runLater(() -> statusLabel.setText("Connected. Waiting for weather data..."));
+////
+////            // Poll loop
+////            while (running.get()) {
+////                try {
+////                    // Poll Kafka for new messages
+////                    var records = consumer.poll(Duration.ofSeconds(3));
+////                    
+////                    if (records.isEmpty()) {
+////                        // No records received yet
+////                        continue;
+////                    }
+////
+////                    for (ConsumerRecord<String, String> record : records) {
+////                        // Process each record from Kafka
+////                        String value = record.value();
+////                        try {
+////                            JSONObject json = new JSONObject(value);
+////                            
+////                            // Debug: Log the full JSON response for inspection
+////                            System.out.println("Received message: " + json.toString());
+////
+////                            // Format timestamp
+////                            String timestamp = LocalDateTime.now()
+////                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+////
+////                            // Extract city name
+////                            String cityName = json.has("city") ? json.getString("city") : "Unknown Location";
+////                            
+////                            // Extract weather data
+////                            double tempCelsius = json.getDouble("temperature");
+////                            int humidity = json.getInt("humidity");
+////                            String condition = json.getString("description");
+////                            double windSpeed = json.getDouble("wind_speed");
+////
+////                            // Update the UI with the fetched data
+////                            final String conditionText = condition;
+////                            final String windText = windSpeed + " m/s";
+////                            
+////                            Platform.runLater(() -> {
+////                                statusLabel.setText("Last update: " + timestamp);
+////                                cityLabel.setText(cityName);
+////                                temperatureLabel.setText("Temperature: " + String.format("%.1f", tempCelsius) + "°C");
+////                                conditionLabel.setText("Condition: " + conditionText);
+////                                humidityLabel.setText("Humidity: " + humidity + "%");
+////                                windLabel.setText("Wind: " + windText);
+////                            });
+////
+////                        } catch (JSONException e) {
+////                            // Handle JSON parsing errors
+////                            Platform.runLater(() -> 
+////                                statusLabel.setText("Error parsing data: " + e.getMessage())
+////                            );
+////                        }
+////                    }
+////                } catch (Exception e) {
+////                    // Handle general errors during polling
+////                    Platform.runLater(() -> 
+////                        statusLabel.setText("Error connecting to Kafka: " + e.getMessage())
+////                    );
+////                    
+////                    // Wait before retrying to avoid spinning
+////                    try {
+////                        Thread.sleep(5000);
+////                    } catch (InterruptedException ie) {
+////                        Thread.currentThread().interrupt();
+////                        break;
+////                    }
+////                }
+////            }
+////        } catch (Exception e) {
+////            // Handle consumer creation errors
+////            Platform.runLater(() -> 
+////                statusLabel.setText("Failed to initialize Kafka consumer: " + e.getMessage())
+////            );
+////        }
+////    }
+////}
+//
+//
+////package com.example.weather.ui;
+////
+////import javafx.application.Application;
+////import javafx.application.Platform;
+////import javafx.geometry.Insets;
+////import javafx.geometry.Pos;
+////import javafx.scene.Scene;
+////import javafx.scene.chart.LineChart;
+////import javafx.scene.chart.NumberAxis;
+////import javafx.scene.chart.XYChart;
+////import javafx.scene.control.Label;
+////import javafx.scene.layout.VBox;
+////import javafx.scene.text.Font;
+////import javafx.stage.Stage;
+////import org.apache.kafka.clients.consumer.ConsumerConfig;
+////import org.apache.kafka.clients.consumer.ConsumerRecord;
+////import org.apache.kafka.clients.consumer.KafkaConsumer;
+////import org.json.JSONException;
+////import org.json.JSONObject;
+////
+////import java.time.Duration;
+////import java.time.LocalDateTime;
+////import java.time.format.DateTimeFormatter;
+////import java.util.Collections;
+////import java.util.Properties;
+////import java.util.concurrent.atomic.AtomicBoolean;
+////
+////public class WeatherMonitoringUI extends Application {
+////
+////    private Label statusLabel = new Label("Connecting to weather data source...");
+////    private Label cityLabel = new Label("Location: --");
+////    private Label temperatureLabel = new Label("Temperature: --°C");
+////    private Label conditionLabel = new Label("Condition: --");
+////    private Label humidityLabel = new Label("Humidity: --%");
+////    private Label windLabel = new Label("Wind: -- m/s");
+////    
+////    private static final String KAFKA_TOPIC = "weather-data";
+////    private static final String KAFKA_SERVER = "localhost:9092";
+////    private static final String KAFKA_GROUP_ID = "weather-consumer-group";
+////    private final AtomicBoolean running = new AtomicBoolean(true);
+////    
+////    private XYChart.Series<Number, Number> temperatureSeries = new XYChart.Series<>();
+////
+////    public static void main(String[] args) {
+////        launch(args);
+////    }
+////
+////    @Override
+////    public void start(Stage primaryStage) {
+////        // UI Setup with proper layout
+////        VBox root = new VBox(15);
+////        root.setAlignment(Pos.CENTER);
+////        root.setPadding(new Insets(20));
+////        
+////        // Style the labels
+////        statusLabel.setFont(new Font(14));
+////        cityLabel.setFont(new Font(20));
+////        temperatureLabel.setFont(new Font(18));
+////        conditionLabel.setFont(new Font(16));
+////        humidityLabel.setFont(new Font(16));
+////        windLabel.setFont(new Font(16));
+////        
+////        // Create the line chart for temperature
+////        NumberAxis xAxis = new NumberAxis();
+////        NumberAxis yAxis = new NumberAxis();
+////        xAxis.setLabel("Time");
+////        yAxis.setLabel("Temperature (°C)");
+////        LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
+////        lineChart.getData().add(temperatureSeries);
+////        
+////        // Add the chart to the root layout
+////        root.getChildren().addAll(
+////            statusLabel, 
+////            cityLabel,
+////            temperatureLabel, 
+////            conditionLabel,
+////            humidityLabel,
+////            windLabel,
+////            lineChart
+////        );
+////
+////        // Set up the stage
+////        primaryStage.setTitle("Weather Monitoring");
+////        primaryStage.setScene(new Scene(root, 800, 600));
+////        primaryStage.show();
+////
+////        // Fetch data from Kafka (in a new thread)
+////        Thread kafkaThread = new Thread(this::consumeWeatherData);
+////        kafkaThread.setDaemon(true); // Allow app to exit when closed
+////        kafkaThread.start();
+////        
+////        // Make sure to clean up when the application closes
+////        primaryStage.setOnCloseRequest(e -> running.set(false));
+////    }
+////
+////    private void consumeWeatherData() {
+////        // Kafka Consumer Configuration
+////        Properties props = new Properties();
+////        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+////        props.put(ConsumerConfig.GROUP_ID_CONFIG, KAFKA_GROUP_ID);
+////        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+////        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // Start with latest messages
+////
+////        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+////            consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
+////            
+////            // Update UI to show we're connected
+////            Platform.runLater(() -> statusLabel.setText("Connected. Waiting for weather data..."));
+////
+////            // Poll loop
+////            while (running.get()) {
+////                try {
+////                    // Poll Kafka for new messages
+////                    var records = consumer.poll(Duration.ofSeconds(3));
+////                    
+////                    if (records.isEmpty()) {
+////                        // No records received yet
+////                        continue;
+////                    }
+////
+////                    for (ConsumerRecord<String, String> record : records) {
+////                        // Process each record from Kafka
+////                        String value = record.value();
+////                        try {
+////                            JSONObject json = new JSONObject(value);
+////                            
+////                            // Debug: Log the full JSON response for inspection
+////                            System.out.println("Received message: " + json.toString());
+////
+////                            // Format timestamp
+////                            String timestamp = LocalDateTime.now()
+////                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+////
+////                            // Extract city name
+////                            String cityName = json.has("city") ? json.getString("city") : "Unknown Location";
+////                            
+////                            // Extract weather data
+////                            double tempCelsius = json.getDouble("temperature");
+////                            int humidity = json.getInt("humidity");
+////                            String condition = json.getString("description");
+////                            double windSpeed = json.getDouble("wind_speed");
+////
+////                            // Update the UI with the fetched data
+////                            final String conditionText = condition;
+////                            final String windText = windSpeed + " m/s";
+////                            
+////                            Platform.runLater(() -> {
+////                                statusLabel.setText("Last update: " + timestamp);
+////                                cityLabel.setText(cityName);
+////                                temperatureLabel.setText("Temperature: " + String.format("%.1f", tempCelsius) + "°C");
+////                                conditionLabel.setText("Condition: " + conditionText);
+////                                humidityLabel.setText("Humidity: " + humidity + "%");
+////                                windLabel.setText("Wind: " + windText);
+////
+////                                // Add the new temperature data to the chart
+////                                temperatureSeries.getData().add(new XYChart.Data<>(System.currentTimeMillis(), tempCelsius));
+////                                if (temperatureSeries.getData().size() > 50) {
+////                                    temperatureSeries.getData().remove(0); // Remove old data if needed
+////                                }
+////                            });
+////
+////                        } catch (JSONException e) {
+////                            // Handle JSON parsing errors
+////                            Platform.runLater(() -> 
+////                                statusLabel.setText("Error parsing data: " + e.getMessage())
+////                            );
+////                        }
+////                    }
+////                } catch (Exception e) {
+////                    // Handle general errors during polling
+////                    Platform.runLater(() -> 
+////                        statusLabel.setText("Error connecting to Kafka: " + e.getMessage())
+////                    );
+////                    
+////                    // Wait before retrying to avoid spinning
+////                    try {
+////                        Thread.sleep(5000);
+////                    } catch (InterruptedException ie) {
+////                        Thread.currentThread().interrupt();
+////                        break;
+////                    }
+////                }
+////            }
+////        } catch (Exception e) {
+////            // Handle consumer creation errors
+////            Platform.runLater(() -> 
+////                statusLabel.setText("Failed to initialize Kafka consumer: " + e.getMessage())
+////            );
+////        }
+////    }
+////}
+//
+//
+//package com.example.weather.ui;
+//
+//import com.example.weather.database.DatabaseManager;
+//import javafx.application.Application;
+//import javafx.application.Platform;
+//import javafx.geometry.Insets;
+//import javafx.geometry.Pos;
+//import javafx.scene.Scene;
+//import javafx.scene.control.Button;
+//import javafx.scene.control.Label;
+//import javafx.scene.layout.VBox;
+//import javafx.scene.text.Font;
+//import javafx.stage.Stage;
+//import org.apache.kafka.clients.consumer.ConsumerConfig;
+//import org.apache.kafka.clients.consumer.ConsumerRecord;
+//import org.apache.kafka.clients.consumer.KafkaConsumer;
+//import org.json.JSONObject;
+//
+//import java.time.Duration;
+//import java.util.Collections;
+//import java.util.Properties;
+//import java.util.concurrent.atomic.AtomicBoolean;
+//
+//public class WeatherMonitoringUI extends Application {
+//
+//    private Label statusLabel = new Label("Connecting to weather data source...");
+//    private Label cityLabel = new Label("Location: --");
+//    private Label temperatureLabel = new Label("Temperature: --°C");
+//    private Label conditionLabel = new Label("Condition: --");
+//    private Label humidityLabel = new Label("Humidity: --%");
+//    private Label windLabel = new Label("Wind: -- m/s");
+//
+//    private static final String KAFKA_TOPIC = "weather-data";
+//    private static final String KAFKA_SERVER = "localhost:9092";
+//    private static final String KAFKA_GROUP_ID = "weather-consumer-group";
+//    private final AtomicBoolean running = new AtomicBoolean(true);
+//
+//    public static void main(String[] args) {
+//        DatabaseManager.createTable(); // Ensure database is initialized
+//        launch(args);
+//    }
+//
+//    @Override
+//    public void start(Stage primaryStage) {
+//        VBox root = new VBox(15);
+//        root.setAlignment(Pos.CENTER);
+//        root.setPadding(new Insets(20));
+//
+//        statusLabel.setFont(new Font(14));
+//        cityLabel.setFont(new Font(20));
+//        temperatureLabel.setFont(new Font(18));
+//        conditionLabel.setFont(new Font(16));
+//        humidityLabel.setFont(new Font(16));
+//        windLabel.setFont(new Font(16));
+//
+//        Button showGraphButton = new Button("Show Weather Trends");
+//        showGraphButton.setOnAction(e -> WeatherChartUI.display());
+//
+//        root.getChildren().addAll(statusLabel, cityLabel, temperatureLabel, conditionLabel, humidityLabel, windLabel, showGraphButton);
+//
+//        primaryStage.setTitle("Weather Monitoring");
+//        primaryStage.setScene(new Scene(root, 600, 400));
+//        primaryStage.show();
+//
+//        Thread kafkaThread = new Thread(this::consumeWeatherData);
+//        kafkaThread.setDaemon(true);
+//        kafkaThread.start();
+//
+//        primaryStage.setOnCloseRequest(e -> running.set(false));
+//    }
+//
+//    private void consumeWeatherData() {
+//        Properties props = new Properties();
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+//        props.put(ConsumerConfig.GROUP_ID_CONFIG, KAFKA_GROUP_ID);
+//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+//        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+//
+//        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+//            consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
+//            Platform.runLater(() -> statusLabel.setText("Connected. Waiting for weather data..."));
+//
+//            while (running.get()) {
+//                var records = consumer.poll(Duration.ofSeconds(3));
+//                for (ConsumerRecord<String, String> record : records) {
+//                    JSONObject json = new JSONObject(record.value());
+//
+//                    String city = json.getString("city");
+//                    double temperature = json.getDouble("temperature");
+//                    int humidity = json.getInt("humidity");
+//                    String condition = json.getString("description");
+//                    double windSpeed = json.getDouble("wind_speed");
+//                    String timestamp = json.getString("timestamp");
+//
+//                    DatabaseManager.insertWeatherData(city, temperature, humidity, condition, windSpeed, timestamp);
+//
+//                    Platform.runLater(() -> {
+//                        statusLabel.setText("Last update: " + timestamp);
+//                        cityLabel.setText("Location: " + city);
+//                        temperatureLabel.setText("Temperature: " + temperature + "°C");
+//                        conditionLabel.setText("Condition: " + condition);
+//                        humidityLabel.setText("Humidity: " + humidity + "%");
+//                        windLabel.setText("Wind: " + windSpeed + " m/s");
+//                    });
+//                }
+//            }
+//        }
+//    }
+//}
+//
+
+package com.example.weather.ui;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.chart.*;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
+
+public class WeatherMonitoringUI extends Application {
+    private ComboBox<String> citySelector;
+    private Label temperatureLabel;
+    private Label humidityLabel;
+    private BarChart<String, Number> barChart;
+    private LineChart<Number, Number> lineChart;
+    
+    @Override
+    public void start(Stage primaryStage) {
+        citySelector = new ComboBox<>();
+        citySelector.getItems().addAll("New York", "London", "Tokyo", "Mumbai", "Sydney");
+        citySelector.setValue("New York");
+        Button fetchButton = new Button("Fetch Weather");
+        fetchButton.setOnAction(e -> fetchWeatherData(citySelector.getValue()));
+        
+        temperatureLabel = new Label("Temperature: --");
+        humidityLabel = new Label("Humidity: --");
+        
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Weather Data");
+        
+        NumberAxis lineXAxis = new NumberAxis();
+        NumberAxis lineYAxis = new NumberAxis();
+        lineChart = new LineChart<>(lineXAxis, lineYAxis);
+        lineChart.setTitle("Temperature Trends");
+        
+        VBox layout = new VBox(10, citySelector, fetchButton, temperatureLabel, humidityLabel, barChart, lineChart);
+        layout.setPadding(new Insets(10));
+        primaryStage.setScene(new Scene(layout, 600, 500));
+        primaryStage.setTitle("Weather Monitoring System");
+        primaryStage.show();
+        
+        fetchWeatherData(citySelector.getValue());
+    }
+    
+    private void fetchWeatherData(String city) {
+        try {
+            String apiKey = "6e1a202fdcb54fcb42c67944d7fa6671";
+            String urlString = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+            HttpURLConnection conn = (HttpURLConnection) new URL(urlString).openConnection();
+            conn.setRequestMethod("GET");
+            
+            Scanner scanner = new Scanner(conn.getInputStream());
+            StringBuilder response = new StringBuilder();
+            while (scanner.hasNext()) {
+                response.append(scanner.nextLine());
+            }
+            scanner.close();
+            
+            JSONObject json = new JSONObject(response.toString());
+            double temperature = json.getJSONObject("main").getDouble("temp");
+            int humidity = json.getJSONObject("main").getInt("humidity");
+            
+            temperatureLabel.setText("Temperature: " + temperature + "°C");
+            humidityLabel.setText("Humidity: " + humidity + "%");
+            
+            updateCharts(city, temperature, humidity);
+        } catch (IOException e) {
+            temperatureLabel.setText("Error fetching data");
+            humidityLabel.setText("");
+        }
+    }
+    
+    private void updateCharts(String city, double temperature, int humidity) {
+        barChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName(city);
+        series.getData().add(new XYChart.Data<>("Temperature", temperature));
+        series.getData().add(new XYChart.Data<>("Humidity", humidity));
+        barChart.getData().add(series);
+        
+        lineChart.getData().clear();
+        XYChart.Series<Number, Number> tempSeries = new XYChart.Series<>();
+        tempSeries.setName("Temperature Trend");
+        for (int i = 1; i <= 5; i++) {
+            tempSeries.getData().add(new XYChart.Data<>(i, temperature + Math.random() * 2 - 1));
+        }
+        lineChart.getData().add(tempSeries);
+    }
+    
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
